@@ -22,14 +22,20 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useTasksStore } from '../stores/tasksStore';
+
+const tasksStore = useTasksStore();
 
 const taskName = ref("");
 const taskDescription = ref("");
 
 const saveTask = () => {
-    console.log(taskName.value);
-    console.log(taskDescription.value);
-    // здесь будем сохранять в пинию - пинии пока нет - надо сделать пинию
+    tasksStore.addTask({
+        name: taskName.value,
+        description: taskDescription.value,
+    });
+    taskName.value = "";
+    taskDescription.value = "";
 }
 </script>
 <style scoped></style>

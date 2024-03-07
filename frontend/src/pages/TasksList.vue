@@ -62,7 +62,7 @@
                             <v-btn
                                 color="secondary"
                                 variant="text"
-                                @click="saveTask(task, idx)"
+                                @click="saveTask(task)"
                             >
                                 Сохранить
                             </v-btn>
@@ -85,9 +85,11 @@
 import AddTaskForm from '../components/AddTaskForm.vue';
 import { useRouter } from 'vue-router';
 import { onMounted, ref } from 'vue';
-import axios from 'axios';
+import { useTasksStore } from '../stores/tasksStore';
+import { storeToRefs } from 'pinia';
 
-const tasksList = ref([]);
+const tasksStore = useTasksStore();
+const tasksList = storeToRefs(tasksStore).tasks;
 const tasksEl = ref(null);
 const router = useRouter()
 const isChangingTask = ref(false);
@@ -103,14 +105,8 @@ const toBack = () => {
 }
 
 const deleteTask = (task, index) => {
-    axios.delete(`http://127.0.0.1:8000/tasks/${task.id}/`).then((res) => {
-        if (res.status === 204) {
-            tasksList.value = tasksList.value.filter((el, idx) => {
-                return el != task;
-            });
-            tasksEl.value[index].$el.querySelector('button').click();
-        }
-    });
+    tasksStore.deleteTask(task, index);
+    tasksEl.value[index].$el.querySelector('button').click();
 }
 
 const changeTask = (task) => {
@@ -118,29 +114,13 @@ const changeTask = (task) => {
     changingTaskItem.value = {...task};
 }
 
-const saveTask = (task, index) => {
-    tasksList.value.forEach((el) => {
-        if (el === task) {
-            axios.patch(`http://127.0.0.1:8000/tasks/${task.id}/`, {
-                name: changingTaskItem.value.name,
-                description: changingTaskItem.value.description
-            }).then((res) => {
-                if (res.status === 200) {
-                    el.name = changingTaskItem.value.name;
-                    el.description = changingTaskItem.value.description;
-                    isChangingTask.value = false;
-                }
-            });
-        }
-    });
+const saveTask = (task) => {
+    tasksStore.changeTask(task, changingTaskItem.value);
+    isChangingTask.value = false;
 }
 
 onMounted(() => {
-    axios.get('http://127.0.0.1:8000/tasks/').then((res) => {
-        if (res.status === 200) {
-            tasksList.value = res.data;
-        }
-    });
+    tasksStore.getTasks();
 })
 </script>
 
@@ -151,12 +131,11 @@ onMounted(() => {
     justify-self: baseline;
 }
 main {
-    margin-top: 20px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
 }
 h2 {
-    margin-top: 20px;
+    margin: 20px 0;
 }
 .tasks-component {
     width: 700px;
