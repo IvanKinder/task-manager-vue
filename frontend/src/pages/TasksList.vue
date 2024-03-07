@@ -6,7 +6,11 @@
         <h2>Список задач</h2>
     </header>
     <main>
-        <v-expansion-panels variant="popout" :readonly="isChangingTask">
+        <div>
+            <h2>Добавить задачу</h2>
+            <add-task-form />
+        </div>
+        <v-expansion-panels class="tasks-component" variant="popout" :readonly="isChangingTask">
             <v-expansion-panel
                 v-for="(task, idx) in tasksList"
                 :key="task.id"
@@ -78,6 +82,7 @@
 </template>
 
 <script setup lang="ts">
+import AddTaskForm from '../components/AddTaskForm.vue';
 import { useRouter } from 'vue-router';
 import { onMounted, ref } from 'vue';
 import axios from 'axios';
@@ -145,8 +150,15 @@ onMounted(() => {
     width: fit-content;
     justify-self: baseline;
 }
-main, h2 {
+main {
     margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+h2 {
+    margin-top: 20px;
+}
+.tasks-component {
     width: 700px;
 }
 .task-content {
