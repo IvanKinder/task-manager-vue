@@ -87,34 +87,35 @@ import { useRouter } from 'vue-router';
 import { onMounted, ref } from 'vue';
 import { useTasksStore } from '../stores/tasksStore';
 import { storeToRefs } from 'pinia';
+import type { ITask } from '../controls/interfaces/tasks';
 
 const tasksStore = useTasksStore();
 const tasksList = storeToRefs(tasksStore).tasks;
 const tasksEl = ref(null);
 const router = useRouter()
 const isChangingTask = ref(false);
-const changingTaskItem = ref({
-    id: "",
+const changingTaskItem = ref<ITask>({
+    id: undefined,
     name: "",
     description: "",
-    is_done: false,
 });
 
 const toBack = () => {
     router.go(-1);
 }
 
-const deleteTask = (task, index) => {
+const deleteTask = (task: ITask, index: number) => {
     tasksStore.deleteTask(task, index);
+    // @ts-ignore
     tasksEl.value[index].$el.querySelector('button').click();
 }
 
-const changeTask = (task) => {
+const changeTask = (task: ITask) => {
     isChangingTask.value = true;
     changingTaskItem.value = {...task};
 }
 
-const saveTask = (task) => {
+const saveTask = (task: ITask) => {
     tasksStore.changeTask(task, changingTaskItem.value);
     isChangingTask.value = false;
 }

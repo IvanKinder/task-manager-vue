@@ -26,8 +26,8 @@ import { useTasksStore } from '../stores/tasksStore';
 
 const tasksStore = useTasksStore();
 
-const taskName = ref("");
-const taskDescription = ref("");
+const taskName = ref<string>("");
+const taskDescription = ref<string>("");
 
 const saveTask = () => {
     tasksStore.addTask({

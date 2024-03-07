@@ -1,20 +1,21 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue';
-import axios from 'axios';
+import axios, { type AxiosResponse } from 'axios';
+import type { ITask } from '../controls/interfaces/tasks';
 
 
 export const useTasksStore = defineStore('tasks', () => {
-    const tasks = ref<any[]>([]);
+    const tasks = ref<ITask[]>([]);
 
     const getTasks = async () => {
-        const res = await axios.get('http://127.0.0.1:8000/tasks/');
+        const res: AxiosResponse = await axios.get('http://127.0.0.1:8000/tasks/');
         if (res.status === 200) {
             tasks.value = res.data;
         }
     }
 
-    const deleteTask = async (task: any, index: number) => {
-        const res = await axios.delete(`http://127.0.0.1:8000/tasks/${task.id}/`);
+    const deleteTask = async (task: ITask, index: number) => {
+        const res: AxiosResponse = await axios.delete(`http://127.0.0.1:8000/tasks/${task.id}/`);
         if (res.status === 204) {
             tasks.value = tasks.value.filter((el, idx) => {
                 return el != task;
@@ -22,12 +23,12 @@ export const useTasksStore = defineStore('tasks', () => {
         }
     }
 
-    const changeTask = async (task: any, changingTaskItem: any) => {
-        const res = await axios.patch(`http://127.0.0.1:8000/tasks/${task.id}/`, {
+    const changeTask = async (task: ITask, changingTaskItem: ITask) => {
+        const res: AxiosResponse = await axios.patch(`http://127.0.0.1:8000/tasks/${task.id}/`, {
             name: changingTaskItem.name,
             description: changingTaskItem.description
         });
-        tasks.value.forEach((el: any) => {
+        tasks.value.forEach((el: ITask) => {
             if (el === task) {
                 if (res.status === 200) {
                     el.name = changingTaskItem.name;
@@ -37,8 +38,8 @@ export const useTasksStore = defineStore('tasks', () => {
         });
     }
 
-    const addTask = async (task: any) => {
-        const res: any = await axios.post(`http://127.0.0.1:8000/tasks/`, task);
+    const addTask = async (task: ITask) => {
+        const res: AxiosResponse<ITask> = await axios.post(`http://127.0.0.1:8000/tasks/`, task);
         if (res.status === 201) {
             tasks.value.push(res.data);
         }
